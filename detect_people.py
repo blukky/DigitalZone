@@ -1,3 +1,5 @@
+#!venv/bin/python
+
 import cv2
 import numpy as np
 import os
@@ -131,9 +133,8 @@ if __name__ == '__main__':
             ret, frame = rec.read()
             detections = pre_process(frame.copy(), net)
             img = post_process(frame.copy(), detections)
-            # cv2.putText(img, label, (20, 40), FONT_FACE, FONT_SCALE, RED, THICKNESS, cv2.LINE_AA)
             cv2.imshow(window_name, img)
-            cv2.waitKey(60)
+            cv2.waitKey(1)
         rec.release()
         cv2.destroyAllWindows()
     elif img_path != None:
