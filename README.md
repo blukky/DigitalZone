@@ -17,5 +17,6 @@
 нужду в соединении с интернетом.
 
 ## Демонстрация работы
+![alt text](https://github.com/blukky/DigitalZone/blob/master/view.jpeg?raw=true)
 
 ## Тепловая дорожка
