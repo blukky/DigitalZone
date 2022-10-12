@@ -51,12 +51,11 @@ def pre_process(input_image, net):
     return outputs
 
 
-def post_process(input_image, outputs, img_num):
+def post_process(input_image, outputs):
     # Lists to hold respective values while unwrapping.
     class_ids = []
     confidences = []
     boxes = []
-    img = np.array([])
     # Rows.
     rows = outputs[0].shape[1]
 
@@ -103,10 +102,6 @@ def post_process(input_image, outputs, img_num):
         width = box[2]
         height = box[3]
         cv2.rectangle(input_image, (left, top), (left + width, top + height), BLUE, 3 * THICKNESS)
-        # img = input_image[top:top+height, left:left+width]
-        # if img.size > 0:
-            # cv2.imshow("window", img)
-            # cv2.imwrite(PATH_SAVE + f"img_{img_num}.jpg", img)
         label = "{}:{:.2f}".format(classes[class_ids[i]], confidences[i])
         draw_label(input_image, label, left, top)
 
@@ -129,28 +124,22 @@ if __name__ == '__main__':
 
     # Load image.
     if video_path != None:
-        rec = cv2.imread(video_path)
-        input = rec.copy()
+        rec = cv2.VideoCapture(video_path)
 
 
+        while rec.isOpened:
+            ret, frame = rec.read()
+            detections = pre_process(frame.copy(), net)
+            img = post_process(frame.copy(), detections)
+            # cv2.putText(img, label, (20, 40), FONT_FACE, FONT_SCALE, RED, THICKNESS, cv2.LINE_AA)
+            cv2.imshow(window_name, img)
+            cv2.waitKey(60)
+        rec.release()
+        cv2.destroyAllWindows()
+    elif img_path != None:
+        frame = cv2.imread(img_path)
+        detections = pre_process(frame.copy(), net)
+        img = post_process(frame.copy(), detections)
 
-
-        # Put efficiency information. The function getPerfProfile returns the overall time for inference(t) and the
-        # timings for each of the layers(in layersTimes)
-        # Process image.
-        # cycles = 1
-        # total_time = 0
-        # for i in range(cycles):
-        detections = pre_process(input.copy(), net)
-        img = post_process(frame.copy(), detections, ind)
-        # t, _ = net.getPerfProfile()
-        # total_time += t
-        # print(f'Cycle [{i + 1}]:\t{t * 1000.0 / cv2.getTickFrequency():.2f}\tms')
-
-        # avg_time = total_time / cycles
-        # label = 'Average Inference time: %.2f ms' % (avg_time * 1000.0 / cv2.getTickFrequency())
-        # print(f'Model: {window_name}\n{label}')
-        # cv2.putText(img, label, (20, 40), FONT_FACE, FONT_SCALE, RED, THICKNESS, cv2.LINE_AA)
-        # if img.size > 0:
-        #     cv2.imshow(window_name, img)
-        #     cv2.waitKey(0)
+        cv2.imshow(window_name, img)
+        cv2.waitKey(0)

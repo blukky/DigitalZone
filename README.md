@@ -16,6 +16,13 @@
 приложение, что упрощает с ним взаимодействие и убирает
 нужду в соединении с интернетом.
 
+## Запуск программы
+### Для видео
+    python detect_people.py --video path/to/video
+
+### Для изображений
+    python detect_people.py --img path/to/image
+
 ## Демонстрация работы
 ![alt text](https://github.com/blukky/DigitalZone/blob/master/view.jpeg?raw=true)
 
