@@ -151,10 +151,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--video', default=None, help="Путь к вашему видео")
     parser.add_argument('--img', default=None, help="Путь к вашему изображению")
-    parser.add_argument('--speed', default=None, help="Скорость обработки видео")
+    parser.add_argument('--speed', default=1, help="Скорость обработки видео")
     args = parser.parse_args()
 
     video_path, img_path, speed = args.video, args.img, int(args.speed)
+
     # Load class names.
     model_path = "modelV2.onnx"
     # Give the weight files to the model and load the network using them.
