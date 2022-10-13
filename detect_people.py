@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 import os
 import argparse
+import tensorflow as tf
 
 # Constants.
 INPUT_WIDTH = 416
@@ -17,25 +18,31 @@ FONT_FACE = cv2.FONT_HERSHEY_SIMPLEX
 FONT_SCALE = 0.7
 THICKNESS = 1
 
+MODEL_JACKET = tf.keras.models.load_model("model_finetune0.88.h5")
+MODEL_PANTS = tf.keras.models.load_model("mobilenetV2_full_trainable_pants_0.7638376355171204.h5")
+
+CLASSES_JACKET = {0: "Invisible Jacket", 1: "No Jacket", 2: "With Jacket"}
+CLASSES_PANTS = {0: "Invisible Pants", 1: "No Pants", 2: "With Pants"}
+
 # Colors
 BLACK = (0, 0, 0)
 BLUE = (255, 178, 50)
 YELLOW = (0, 255, 255)
 RED = (0, 0, 255)
+GEEN = (0, 255, 0)
 
 
-# PATH_SAVE = "../classifier_data/"
 
-def draw_label(input_image, label, left, top):
+def draw_label(input_image, label, left, top, color):
     """Draw text onto image at location."""
 
     # Get text size.
     text_size = cv2.getTextSize(label, FONT_FACE, FONT_SCALE, THICKNESS)
     dim, baseline = text_size[0], text_size[1]
     # Use text size to create a BLACK rectangle.
-    cv2.rectangle(input_image, (left, top), (left + dim[0], top + dim[1] + baseline), BLACK, cv2.FILLED)
+    cv2.rectangle(input_image, (left, top), (left + dim[0], top + dim[1] + baseline), color, cv2.FILLED)
     # Display text inside the rectangle.
-    cv2.putText(input_image, label, (left, top + dim[1]), FONT_FACE, FONT_SCALE, YELLOW, THICKNESS, cv2.LINE_AA)
+    cv2.putText(input_image, label, (left, top + dim[1]), FONT_FACE, FONT_SCALE, BLACK, THICKNESS, cv2.LINE_AA)
 
 
 def pre_process(input_image, net):
@@ -51,6 +58,15 @@ def pre_process(input_image, net):
     # print(outputs[0].shape)
 
     return outputs
+
+
+def get_color(jck, pnts):
+    if jck == 2 and pnts == 2:
+        return GEEN
+    elif jck == 1 and pnts == 1:
+        return RED
+    else:
+        return YELLOW
 
 
 def post_process(input_image, outputs):
@@ -103,9 +119,19 @@ def post_process(input_image, outputs):
         top = box[1]
         width = box[2]
         height = box[3]
-        cv2.rectangle(input_image, (left, top), (left + width, top + height), BLUE, 3 * THICKNESS)
-        label = "{}:{:.2f}".format(classes[class_ids[i]], confidences[i])
-        draw_label(input_image, label, left, top)
+        img = input_image[top:top + height, left:left + width]
+        img = tf.image.resize(img, (100, 100))
+        pred_jacket = MODEL_JACKET.predict(img[None, ...])[0]
+        pred_pants = MODEL_PANTS.predict(img[None, ...])[0]
+        arg_jacket = np.argmax(pred_jacket)
+        arg_pants = np.argmax(pred_pants)
+        color = get_color(arg_jacket, arg_pants)
+        cv2.rectangle(input_image, (left, top), (left + width, top + height), color, 3 * THICKNESS)
+        label = "{}:{:.2f} {}:{:.2f}".format(CLASSES_JACKET[arg_jacket],
+                                              pred_jacket[arg_jacket],
+                                              CLASSES_PANTS[arg_pants],
+                                              pred_pants[arg_pants])
+        draw_label(input_image, label, left, top, color)
 
     return input_image
 
