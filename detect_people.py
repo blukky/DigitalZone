@@ -37,14 +37,14 @@ def draw_label(input_image, label, left, top, color):
     """Draw text onto image at location."""
 
     # Get text size.
-    dy = 5
+    dy = 25
     # Use text size to create a BLACK rectangle.
     for line, text in enumerate(label.split("\n")):
         text_size = cv2.getTextSize(text, FONT_FACE, FONT_SCALE, THICKNESS)
         dim, baseline = text_size[0], text_size[1]
-        cv2.rectangle(input_image, (left, top + line*dy ), (left + dim[0], top + dim[1] + baseline), color, cv2.FILLED)
+        cv2.rectangle(input_image, (left,top - 2*line*dy ), (left + dim[0], top - 2*dim[1] - baseline), color, cv2.FILLED)
     # Display text inside the rectangle.
-        cv2.putText(input_image, text, (left, top + dim[1] + line*dy), FONT_FACE, FONT_SCALE, BLACK, THICKNESS, cv2.LINE_AA)
+        cv2.putText(input_image, text, (left, top - dim[1] - line*dy), FONT_FACE, FONT_SCALE, BLACK, THICKNESS, cv2.LINE_AA)
 
 
 def pre_process(input_image, net):
