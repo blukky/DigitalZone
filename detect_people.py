@@ -71,6 +71,13 @@ def get_color(jck, pnts):
         return YELLOW
 
 
+def getGuassianValue(W, H):
+    x, y = np.meshgrid(np.linspace(-1, 1, W), np.linspace(-1, 1, H))
+    d = np.sqrt(x * x + y * y)
+    sigma, mu = 1.0, 0.0
+    return np.exp(-((d - mu) ** 2 / (2.0 * sigma ** 2))).T
+
+
 def post_process(input_image, outputs):
     # Lists to hold respective values while unwrapping.
     class_ids = []
@@ -123,7 +130,7 @@ def post_process(input_image, outputs):
         width = box[2]
         height = box[3]
         img = input_image[top:top + height, left:left + width]
-        heatmp[top:top + height, left:left + width] += 1
+        heatmp[top:top + height, left:left + width] += getGuassianValue(width, height)
         img = tf.image.resize(img, (100, 100))
         pred_jacket = MODEL_JACKET.predict(img[None, ...])[0]
         pred_pants = MODEL_PANTS.predict(img[None, ...])[0]
