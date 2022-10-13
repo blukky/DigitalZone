@@ -37,12 +37,14 @@ def draw_label(input_image, label, left, top, color):
     """Draw text onto image at location."""
 
     # Get text size.
-    text_size = cv2.getTextSize(label, FONT_FACE, FONT_SCALE, THICKNESS)
-    dim, baseline = text_size[0], text_size[1]
+    dy = 5
     # Use text size to create a BLACK rectangle.
-    cv2.rectangle(input_image, (left, top), (left + dim[0], top + dim[1] + baseline), color, cv2.FILLED)
+    for line, text in enumerate(label.split("\n")):
+        text_size = cv2.getTextSize(text, FONT_FACE, FONT_SCALE, THICKNESS)
+        dim, baseline = text_size[0], text_size[1]
+        cv2.rectangle(input_image, (left, top + line*dy ), (left + dim[0], top + dim[1] + baseline), color, cv2.FILLED)
     # Display text inside the rectangle.
-    cv2.putText(input_image, label, (left, top + dim[1]), FONT_FACE, FONT_SCALE, BLACK, THICKNESS, cv2.LINE_AA)
+        cv2.putText(input_image, text, (left, top + dim[1] + line*dy), FONT_FACE, FONT_SCALE, BLACK, THICKNESS, cv2.LINE_AA)
 
 
 def pre_process(input_image, net):
@@ -127,7 +129,7 @@ def post_process(input_image, outputs):
         arg_pants = np.argmax(pred_pants)
         color = get_color(arg_jacket, arg_pants)
         cv2.rectangle(input_image, (left, top), (left + width, top + height), color, 3 * THICKNESS)
-        label = "{}:{:.2f} {}:{:.2f}".format(CLASSES_JACKET[arg_jacket],
+        label = "{}:{:.2f}\n{}:{:.2f}".format(CLASSES_JACKET[arg_jacket],
                                               pred_jacket[arg_jacket],
                                               CLASSES_PANTS[arg_pants],
                                               pred_pants[arg_pants])
