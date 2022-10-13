@@ -21,8 +21,8 @@ THICKNESS = 1
 MODEL_JACKET = tf.keras.models.load_model("model_finetune0.88.h5")
 MODEL_PANTS = tf.keras.models.load_model("mobilenetV2_full_trainable_pants_0.7638376355171204.h5")
 
-CLASSES_JACKET = {0: "Invisible Jacket", 1: "No Jacket", 2: "With Jacket"}
-CLASSES_PANTS = {0: "Invisible Pants", 1: "No Pants", 2: "With Pants"}
+CLASSES_JACKET = {0: "Invisible Jacket", 1: "With Jacket", 2: "No Jacket"}
+CLASSES_PANTS = {0: "Invisible Pants", 1: "With Pants", 2: "No Pants"}
 
 # Colors
 BLACK = (0, 0, 0)
@@ -64,9 +64,9 @@ def pre_process(input_image, net):
 
 def get_color(jck, pnts):
     if jck == 2 and pnts == 2:
-        return GEEN
-    elif jck == 1 and pnts == 1:
         return RED
+    elif jck == 1 and pnts == 1:
+        return GEEN
     else:
         return YELLOW
 
