@@ -26,7 +26,8 @@
 или
 ### Для изображений
 `python detect_people.py --img path_to_img`
-
+#### Для ускорения обработки видео можно установить скорость, но это будет влиять на качество
+для этого необходимо указать еще 1 параметр `--speed число`
 ## Демонстрация работы
 ![alt text](https://github.com/blukky/DigitalZone/blob/master/view.jpeg?raw=true)
 
