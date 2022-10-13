@@ -42,7 +42,7 @@ def draw_label(input_image, label, left, top, color):
     for line, text in enumerate(label.split("\n")):
         text_size = cv2.getTextSize(text, FONT_FACE, FONT_SCALE, THICKNESS)
         dim, baseline = text_size[0], text_size[1]
-        cv2.rectangle(input_image, (left,top - 2*line*dy ), (left + dim[0], top - 2*dim[1] - baseline), color, cv2.FILLED)
+        cv2.rectangle(input_image, (left,top - dim[1] - 2*line*dy ), (left + dim[0], top - 2*dim[1] - baseline), color, cv2.FILLED)
     # Display text inside the rectangle.
         cv2.putText(input_image, text, (left, top - dim[1] - line*dy), FONT_FACE, FONT_SCALE, BLACK, THICKNESS, cv2.LINE_AA)
 
