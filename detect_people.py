@@ -75,7 +75,7 @@ def getGuassianValue(W, H):
     x, y = np.meshgrid(np.linspace(-1, 1, W), np.linspace(-1, 1, H))
     d = np.sqrt(x * x + y * y)
     sigma, mu = 1.0, 0.0
-    return np.exp(-((d - mu) ** 2 / (2.0 * sigma ** 2))).T
+    return np.exp(-((d - mu) ** 2 / (2.0 * sigma ** 2)))
 
 
 def post_process(input_image, outputs):
@@ -83,7 +83,7 @@ def post_process(input_image, outputs):
     class_ids = []
     confidences = []
     boxes = []
-    heatmp = np.zeros_like(input_image)
+    heatmp = np.zeros(input_image.shape[:2], dtype=np.float64)
     # Rows.
     rows = outputs[0].shape[1]
 
