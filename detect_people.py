@@ -169,6 +169,7 @@ if __name__ == '__main__':
             heatmapshow = cv2.applyColorMap(heatmapshow, cv2.COLORMAP_JET)
             super_imposed_img = cv2.addWeighted(heatmapshow, 0.3, frame, 0.5, 0)
             cv2.imshow("HeatMap", super_imposed_img)
+            cv2.waitKey(1)
             cv2.imshow(window_name, img)
             cv2.waitKey(1)
         rec.release()
@@ -176,7 +177,12 @@ if __name__ == '__main__':
     elif img_path != None:
         frame = cv2.imread(img_path)
         detections = pre_process(frame.copy(), net)
-        img = post_process(frame.copy(), detections)
-
+        img, htmp = post_process(frame.copy(), detections)
+        heatmapshow = None
+        heatmapshow = cv2.normalize(np.sum(htmp, axis=0), heatmapshow, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX,
+                                    dtype=cv2.CV_8U)
+        heatmapshow = cv2.applyColorMap(heatmapshow, cv2.COLORMAP_JET)
+        super_imposed_img = cv2.addWeighted(heatmapshow, 0.3, frame, 0.5, 0)
+        cv2.imshow("HeatMap", super_imposed_img)
         cv2.imshow(window_name, img)
         cv2.waitKey(0)
