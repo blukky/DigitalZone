@@ -151,9 +151,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--video', default=None, help="Путь к вашему видео")
     parser.add_argument('--img', default=None, help="Путь к вашему изображению")
+    parser.add_argument('--speed', default=None, help="Скорость обработки видео")
     args = parser.parse_args()
 
-    video_path, img_path = args.video, args.img
+    video_path, img_path, speed = args.video, args.img, int(args.speed)
     # Load class names.
     model_path = "modelV2.onnx"
     # Give the weight files to the model and load the network using them.
@@ -166,15 +167,17 @@ if __name__ == '__main__':
         rec = cv2.VideoCapture(video_path)
 
         heatmp = []
+        iter = 0
         while rec.isOpened:
             ret, frame = rec.read()
-            detections = pre_process(frame.copy(), net)
-            img, htmp = post_process(frame.copy(), detections)
-            heatmp.append(htmp)
-            heatmapshow = None
-            heatmapshow = cv2.normalize(np.sum(heatmp, axis=0), heatmapshow, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U)
-            heatmapshow = cv2.applyColorMap(heatmapshow, cv2.COLORMAP_JET)
-            super_imposed_img = cv2.addWeighted(heatmapshow, 0.3, frame, 0.5, 0)
+            if iter % speed == 0:
+                detections = pre_process(frame.copy(), net)
+                img, htmp = post_process(frame.copy(), detections)
+                heatmp.append(htmp)
+                heatmapshow = None
+                heatmapshow = cv2.normalize(np.sum(heatmp, axis=0), heatmapshow, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U)
+                heatmapshow = cv2.applyColorMap(heatmapshow, cv2.COLORMAP_JET)
+                super_imposed_img = cv2.addWeighted(heatmapshow, 0.3, frame, 0.5, 0)
             cv2.imshow("HeatMap", super_imposed_img)
             cv2.waitKey(1)
             cv2.imshow(window_name, img)
