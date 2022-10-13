@@ -76,6 +76,7 @@ def post_process(input_image, outputs):
     class_ids = []
     confidences = []
     boxes = []
+    heatmp = np.zeros_like(input_image)
     # Rows.
     rows = outputs[0].shape[1]
 
@@ -122,6 +123,7 @@ def post_process(input_image, outputs):
         width = box[2]
         height = box[3]
         img = input_image[top:top + height, left:left + width]
+        heatmp[top:top + height, left:left + width] += 1
         img = tf.image.resize(img, (100, 100))
         pred_jacket = MODEL_JACKET.predict(img[None, ...])[0]
         pred_pants = MODEL_PANTS.predict(img[None, ...])[0]
@@ -135,7 +137,7 @@ def post_process(input_image, outputs):
                                               pred_pants[arg_pants])
         draw_label(input_image, label, left, top, color)
 
-    return input_image
+    return input_image, heatmp
 
 
 if __name__ == '__main__':
@@ -156,11 +158,18 @@ if __name__ == '__main__':
     if video_path != None:
         rec = cv2.VideoCapture(video_path)
 
-
+        heatmp = []
         while rec.isOpened:
             ret, frame = rec.read()
             detections = pre_process(frame.copy(), net)
-            img = post_process(frame.copy(), detections)
+            img, htmp = post_process(frame.copy(), detections)
+            heatmp.append(htmp)
+            heatmapshow = None
+            heatmapshow = cv2.normalize(np.sum(heatmp, axis=0), heatmapshow, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U)
+            heatmapshow = cv2.applyColorMap(heatmapshow, cv2.COLORMAP_JET)
+            super_imposed_img = cv2.addWeighted(heatmapshow, 0.3, frame, 0.5, 0)
+            cv2.imshow("HeatMap", super_imposed_img)
+            cv2.waitKey(1)
             cv2.imshow(window_name, img)
             cv2.waitKey(1)
         rec.release()
