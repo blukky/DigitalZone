@@ -4,8 +4,8 @@ import cv2
 import numpy as np
 import os
 import argparse
+from keras.applications.mobilenet_v2 import preprocess_input as preprocess_mobilenet
 import tensorflow as tf
-
 # Constants.
 INPUT_WIDTH = 416
 INPUT_HEIGHT = 416
@@ -134,6 +134,7 @@ def post_process(input_image, outputs):
         w, h = np.shape(heatmp[top:top + height, left:left + width])
         heatmp[top:top + height, left:left + width] += getGuassianValue(w, h)
         img = tf.image.resize(img, (100, 100))
+        img = preprocess_mobilenet(img)
         pred_jacket = MODEL_JACKET.predict(img[None, ...])[0]
         pred_pants = MODEL_PANTS.predict(img[None, ...])[0]
         arg_jacket = np.argmax(pred_jacket)
@@ -165,7 +166,7 @@ if __name__ == '__main__':
     window_name = os.path.splitext(os.path.basename(model_path))[0]
     classes = ["person"]
     # newVideo = cv2.VideoWriter('detectVideo.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 30, (1920,1080))
-    # newVideoHeatMap = cv2.VideoWriter('outpy.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 30, (1920,1080))
+    # newVideoHeatMap = cv2.VideoWriter('HeatMap.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 30, (1920,1080))
     # Load image.
     if video_path != None:
         rec = cv2.VideoCapture(video_path)
@@ -182,13 +183,13 @@ if __name__ == '__main__':
                 heatmapshow = cv2.normalize(np.sum(heatmp, axis=0), heatmapshow, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U)
                 heatmapshow = cv2.applyColorMap(heatmapshow, cv2.COLORMAP_JET)
                 super_imposed_img = cv2.addWeighted(heatmapshow, 0.3, frame, 0.5, 0)
-                # newVideo.write(img)
-                # newVideoHeatMap.write(super_imposed_img)
+            # newVideo.write(img)
+            # newVideoHeatMap.write(super_imposed_img)
             cv2.imshow("HeatMap", super_imposed_img)
             cv2.waitKey(1)
             cv2.imshow(window_name, img)
             cv2.waitKey(1)
-        # rec.release()
+        rec.release()
         # newVideo.release()
         # newVideoHeatMap.release()
         cv2.destroyAllWindows()
