@@ -169,7 +169,6 @@ if __name__ == '__main__':
             heatmapshow = cv2.applyColorMap(heatmapshow, cv2.COLORMAP_JET)
             super_imposed_img = cv2.addWeighted(heatmapshow, 0.3, frame, 0.5, 0)
             cv2.imshow("HeatMap", super_imposed_img)
-            cv2.waitKey(1)
             cv2.imshow(window_name, img)
             cv2.waitKey(1)
         rec.release()
