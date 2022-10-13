@@ -179,7 +179,7 @@ if __name__ == '__main__':
         detections = pre_process(frame.copy(), net)
         img, htmp = post_process(frame.copy(), detections)
         heatmapshow = None
-        heatmapshow = cv2.normalize(np.sum(htmp, axis=0), heatmapshow, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX,
+        heatmapshow = cv2.normalize(htmp, heatmapshow, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX,
                                     dtype=cv2.CV_8U)
         heatmapshow = cv2.applyColorMap(heatmapshow, cv2.COLORMAP_JET)
         super_imposed_img = cv2.addWeighted(heatmapshow, 0.3, frame, 0.5, 0)
